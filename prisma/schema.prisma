@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  role      String    @default("PATIENT") // Roles: ADMIN, DOCTOR, PATIENT, STAFF
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  patient   Patient?
+  doctor    Doctor?
+}
+
+model Patient {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateOfBirth    DateTime?
+  gender         String?
+  contactNumber  String?
+  address        String?
+  medicalHistory String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+}
+
+model Doctor {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialization String
+  qualifications String?
+  experienceYears Int?
+  contactNumber  String?
+  availability   String?   // JSON string or simple text describing availability
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[] // Records created by this doctor
+}
+
+model Appointment {
+  id        String    @id @default(cuid())
+  patientId String
+  doctorId  String
+  dateTime  DateTime
+  status    String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  notes     String?   // Patient symptoms or reason for visit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model MedicalRecord {
+  id        String    @id @default(cuid())
+  patientId String
+  doctorId  String
+  diagnosis String
+  treatment String
+  notes     String?
+  date      DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
