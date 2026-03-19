@@ -78,7 +78,10 @@ export default function PatientPortal() {
     }
 
     recognition.onerror = (event: any) => {
-      console.error("Speech recognition error", event.error)
+      console.warn("Speech recognition error:", event.error)
+      if (event.error === 'network') {
+        alert("Speech recognition failed due to a network error. Chrome requires an active internet connection for this feature.")
+      }
       setIsListening(false)
     }
 
