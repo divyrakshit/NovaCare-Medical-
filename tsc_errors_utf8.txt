@@ -1,0 +1,2 @@
+﻿src/app/patient/blood-bank/page.tsx(144,62): error TS1003: Identifier expected.
+src/app/patient/blood-bank/page.tsx(144,64): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.

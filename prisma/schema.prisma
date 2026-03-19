@@ -11,74 +11,121 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String    @unique
-  role      String    @default("PATIENT") // Roles: ADMIN, DOCTOR, PATIENT, STAFF
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  patient   Patient?
-  doctor    Doctor?
+  id         String      @id @default(cuid())
+  name       String?
+  email      String      @unique
+  passwordHash String?
+  role       String      @default("PATIENT") // Roles: ADMIN, DOCTOR, PATIENT, STAFF
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  patient    Patient?
+  doctor     Doctor?
+  bloodDonor BloodDonor?
 }
 
 model Patient {
-  id             String    @id @default(cuid())
-  userId         String    @unique
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String          @id @default(cuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   dateOfBirth    DateTime?
   gender         String?
   contactNumber  String?
   address        String?
   medicalHistory String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
+  bloodRequests  BloodRequest[]
 }
 
 model Doctor {
-  id             String    @id @default(cuid())
-  userId         String    @unique
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialization String
-  qualifications String?
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialization  String
+  qualifications  String?
   experienceYears Int?
-  contactNumber  String?
-  availability   String?   // JSON string or simple text describing availability
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  contactNumber   String?
+  availability    String? // JSON string or simple text describing availability
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   appointments   Appointment[]
   medicalRecords MedicalRecord[] // Records created by this doctor
 }
 
 model Appointment {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   patientId String
   doctorId  String
   dateTime  DateTime
-  status    String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
-  notes     String?   // Patient symptoms or reason for visit
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  status    String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  notes     String? // Patient symptoms or reason for visit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model MedicalRecord {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   patientId String
   doctorId  String
   diagnosis String
   treatment String
   notes     String?
-  date      DateTime  @default(now())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+}
+
+model BloodDonor {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bloodGroup     String
+  lastDonation   DateTime?
+  totalDonations Int       @default(0)
+  isAvailable    Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  donations BloodDonation[]
+}
+
+model BloodDonation {
+  id           String     @id @default(cuid())
+  donorId      String
+  donor        BloodDonor @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  bloodGroup   String
+  volumeMl     Int        @default(450)
+  donationDate DateTime   @default(now())
+  status       String     @default("COMPLETED") // PENDING, COMPLETED, REJECTED
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model BloodInventory {
+  id             String   @id @default(cuid())
+  bloodGroup     String   @unique
+  unitsAvailable Int      @default(0)
+  lastUpdated    DateTime @updatedAt
+}
+
+model BloodRequest {
+  id            String   @id @default(cuid())
+  patientId     String?
+  patient       Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  bloodGroup    String
+  unitsRequired Int
+  urgencyLevel  String   @default("NORMAL") // NORMAL, HIGH, CRITICAL
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED, FULFILLED
+  requestedBy   String? // Doctor ID or Patient ID
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

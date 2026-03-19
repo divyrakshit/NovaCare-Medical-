@@ -1,0 +1,2 @@
+src/app/api/chat/route.ts(11,5): error TS2741: Property 'defaultObjectGenerationMode' is missing in type 'LanguageModelV3' but required in type 'LanguageModelV1'.
+src/app/api/chat/route.ts(16,17): error TS2339: Property 'toTextStreamResponse' does not exist on type 'Promise<StreamTextResult<Record<string, CoreTool<any, any>>>>'.

@@ -1,0 +1,55 @@
+﻿node.exe : warn The configuration property 
+`package.json#prisma` is deprecated and 
+will be removed in Prisma 7. Please 
+migrate to a Prisma config file (e.g., 
+`prisma.config.ts`).
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" 
+"C:\nvm4w\nodejs/node_modules/npm/bin/np 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified 
+   : (warn The config...ma.config.ts`).:S  
+  tring) [], RemoteException
+    + FullyQualifiedErrorId : NativeComman 
+   dError
+ 
+For more information, see: 
+https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+Error: P1012
+
+error: Error validating field `user` in 
+model `BloodDonor`: The relation field 
+`user` on model `BloodDonor` is missing an 
+opposite relation field on the model 
+`User`. Either run `prisma format` or add 
+it manually.
+  -->  prisma\schema.prisma:89
+   | 
+88 |   userId         String    @unique
+89 |   user           User      
+@relation(fields: [userId], references: 
+[id], onDelete: Cascade)
+90 |   bloodGroup     String
+   | 
+error: Error validating field `patient` in 
+model `BloodRequest`: The relation field 
+`patient` on model `BloodRequest` is 
+missing an opposite relation field on the 
+model `Patient`. Either run `prisma 
+format` or add it manually.
+  -->  prisma\schema.prisma:122
+   | 
+121 |   patientId      String?
+122 |   patient        Patient?  
+@relation(fields: [patientId], references: 
+[id], onDelete: SetNull)
+123 |   bloodGroup     String
+   | 
+
+
